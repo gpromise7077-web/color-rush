@@ -14,7 +14,7 @@ export class Game extends Scene {
     private playAgainBtn: Phaser.GameObjects.Graphics;
     private playAgainText: Phaser.GameObjects.Text;
     private Stake: number = 10;
-    private balance: number = 0;
+    private balance: number = 1000;
     private balanceText: Phaser.GameObjects.Text;
     private backgroundGame: Phaser.GameObjects.Image;
     private colorNames: string[] = ["Red", "blue", "Green", "Yellow", "Purple"];
@@ -28,7 +28,7 @@ export class Game extends Scene {
             yoyo: true,
             repeat: 3,
             onComplete: () => {
-                target.x = originalX; // snap back exactly to original position when done
+                target.x = originalX;
             },
         });
     }
@@ -77,9 +77,9 @@ export class Game extends Scene {
         this.drawRoundedBox(this.Box, 500, 300, 200, 100, 0x222222);
 
         EventBus.emit("current-scene-ready", this);
-        EventBus.on("setstake", (amount: number) => {
-            this.Stake = amount;
-            this.balance += amount;
+        EventBus.on("setstake", (value: { amount: number; index: number }) => {
+            this.Stake = value.amount;
+            this.handleGuess(value.index);
             this.balanceText.setText(
                 "Your balance is: " + this.balance + "GVT",
             );
@@ -127,7 +127,10 @@ export class Game extends Scene {
                 .setOrigin(0.5);
             hitZone.setInteractive();
             hitZone.on("pointerdown", () => {
-                this.handleGuess(i);
+                EventBus.emit("color-choosen", {
+                    color: this.colorNames[i],
+                    index: i,
+                });
             });
         });
 
@@ -183,7 +186,6 @@ export class Game extends Scene {
         }
         this.playerGuess = index;
 
-        this.balance -= this.Stake;
         this.balanceText.setText("Balance :" + this.balance + "GVT");
         this.timeLeft
             .setText("Guess locked in! Revealing...")
@@ -216,9 +218,12 @@ export class Game extends Scene {
             this.timeLeft
                 .setText("You lost! " + this.Stake + " GVT")
                 .setColor("#ff0000");
+            this.balance -= this.Stake;
         }
 
         this.balanceText.setText("Balance: " + this.balance + "GVT");
+
+        EventBus.emit("round-End");
 
         this.playAgainBtn.setVisible(true);
         this.playAgainText.setVisible(true);
