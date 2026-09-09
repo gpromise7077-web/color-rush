@@ -14,7 +14,7 @@ export class Game extends Scene {
     private playAgainBtn: Phaser.GameObjects.Graphics;
     private playAgainText: Phaser.GameObjects.Text;
     private Stake: number = 10;
-    private balance: number = 1000;
+    private DemoBalance: number = 1000;
     private balanceText: Phaser.GameObjects.Text;
     private backgroundGame: Phaser.GameObjects.Image;
     private colorNames: string[] = ["Red", "blue", "Green", "Yellow", "Purple"];
@@ -62,16 +62,20 @@ export class Game extends Scene {
                 fontFamily: "Arial",
             })
             .setOrigin(0.5);
-        this.balanceText = this.add.text(
-            800,
-            100,
-            "Your balance is: " + this.balance + "GVT",
-            {
+
+        const balanceBg = this.add.graphics();
+        balanceBg.fillStyle(0x1a2036, 1); // background color
+        balanceBg.lineStyle(2, 0xf9c12c, 1);
+        balanceBg.fillRoundedRect(800, 90, 200, 40, 8);
+        balanceBg.strokeRoundedRect(800, 90, 200, 40, 8);
+
+        this.balanceText = this.add
+            .text(900, 110, "Demo Balance: " + this.DemoBalance + "GVT", {
                 color: "#f9c12c",
                 fontSize: "16px",
                 fontFamily: "Arial",
-            },
-        );
+            })
+            .setOrigin(0.5);
 
         this.Box = this.add.graphics();
         this.drawRoundedBox(this.Box, 500, 300, 200, 100, 0x222222);
@@ -81,7 +85,7 @@ export class Game extends Scene {
             this.Stake = value.amount;
             this.handleGuess(value.index);
             this.balanceText.setText(
-                "Your balance is: " + this.balance + "GVT",
+                "Demo Balance: " + this.DemoBalance + "GVT",
             );
         });
 
@@ -179,14 +183,14 @@ export class Game extends Scene {
         if (this.playerGuess !== null) {
             return;
         }
-        if (this.balance < this.Stake) {
+        if (this.DemoBalance < this.Stake) {
             this.timeLeft.setText("Not enough amount!").setColor("#ff0000");
             this.shakeText(this.timeLeft);
             return;
         }
         this.playerGuess = index;
 
-        this.balanceText.setText("Balance :" + this.balance + "GVT");
+        this.balanceText.setText("Demo Balance :" + this.DemoBalance + "GVT");
         this.timeLeft
             .setText("Guess locked in! Revealing...")
             .setColor("#ffffff");
@@ -210,7 +214,7 @@ export class Game extends Scene {
 
         if (won) {
             const winning = this.Stake * 2;
-            this.balance += winning;
+            this.DemoBalance += winning;
             this.timeLeft
                 .setText("You won! " + winning + " GVT")
                 .setColor("#639922");
@@ -218,12 +222,10 @@ export class Game extends Scene {
             this.timeLeft
                 .setText("You lost! " + this.Stake + " GVT")
                 .setColor("#ff0000");
-            this.balance -= this.Stake;
+            this.DemoBalance -= this.Stake;
         }
 
-        this.balanceText.setText("Balance: " + this.balance + "GVT");
-
-        EventBus.emit("round-End");
+        this.balanceText.setText("Demo Balance: " + this.DemoBalance + "GVT");
 
         this.playAgainBtn.setVisible(true);
         this.playAgainText.setVisible(true);
@@ -236,6 +238,8 @@ export class Game extends Scene {
 
         this.playAgainBtn.setVisible(false);
         this.playAgainText.setVisible(false);
+
+        EventBus.emit("round-End");
     }
 
     update(time: number, delta: number): void {}
