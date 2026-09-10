@@ -55,7 +55,12 @@ export default function Stake() {
 
     return (
         <div className="border items-center justify-center w-[95%] rounded-[5px] bg-[#0e1326] pb-5">
-            <div className="mt-5 ml-5 text-[#2f3851] font-bold md:w-fit">
+            <img
+                src="/assets/gamelogo.png"
+                alt=""
+                className="hidden lg:block lg:absolute lg:w-50 lg:top-25 lg:left-5"
+            />
+            <div className="mt-10 ml-25 text-[#2f3851] font-bold md:w-fit">
                 <h1>YOUR STAKE</h1>
             </div>
 
